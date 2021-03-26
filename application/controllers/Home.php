@@ -10,13 +10,12 @@ class Home extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->theme = $this->core_model->getSetting('theme');
     }
 
     public function index()
     {
         
-        echo "Sauwa";
+        redirect("payment");
 
     }
 

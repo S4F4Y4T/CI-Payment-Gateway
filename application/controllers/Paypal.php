@@ -11,7 +11,7 @@ class Paypal extends CI_Controller{
         $this->load->model('payment'); 
      } 
 
-    function buy(){ 
+    function index(){ 
         // Set variables for paypal form 
         $returnURL = base_url().'paypal/success'; //payment success url 
         $cancelURL = base_url().'paypal/cancel'; //payment cancel url 

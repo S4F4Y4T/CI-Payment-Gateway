@@ -14,7 +14,8 @@ class Stripe extends CI_Controller {
 
     public function index()
     {
-        require_once('application/libraries/stripe-php/init.php');
+        if($this->input->post()){
+            require_once('application/libraries/stripe-php/init.php');
     
         \Stripe\Stripe::setApiKey($this->config->item('stripe_secret'));
         
@@ -22,7 +23,7 @@ class Stripe extends CI_Controller {
         $userID = !empty($_SESSION['userID'])?$_SESSION['userID']:1;
 
         $charge = \Stripe\Charge::create ([
-                "amount" => 60,
+                "amount" => 60*100, //convert cent to dollar
                 "currency" => "usd",
                 "source" => $this->input->post('stripeToken'),
                 "description" => "Products description" 
@@ -51,6 +52,9 @@ class Stripe extends CI_Controller {
             }
         }
            
+        }else{
+            exit('No direct script access allowed');
+        }
     }
 
     public function success(){

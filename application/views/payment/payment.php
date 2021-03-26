@@ -61,7 +61,7 @@ body {font-family: Arial;}
             <h5 class="card-title">Products</h5>
             <p class="card-text">Products description</p>
             <h6>$60usd</h6>
-            <a href="<?php echo base_url('paypal/buy'); ?>" class="btn"><img height="150px" width="180px" src="<?php echo base_url('assets/image/paypal.png'); ?>" /></a>
+            <a href="<?php echo base_url('paypal'); ?>" class="btn"><img height="150px" width="180px" src="<?php echo base_url('assets/image/paypal.png'); ?>" /></a>
         </div>
     </div>
 </div>
@@ -88,13 +88,6 @@ body {font-family: Arial;}
 							class="form-validation" data-cc-on-file="false"
 							data-stripe-publishable-key="<?php echo $this->config->item('stripe_key') ?>"
 							id="payment-form">
-
-							<div class='form-row row'>
-								<div class='col-xs-12 form-group required'>
-									<label class='control-label'>Name on Card</label>
-									<input class='form-control' size='4' type='text'>
-								</div>
-							</div>
 
 							<div class='form-row row'>
 								<div class='col-xs-12 form-group card required'>
