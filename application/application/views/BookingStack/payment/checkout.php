@@ -27,7 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 						</div>
 						<?php } ?>
 
-						<form role="form" action="<?php echo base_url('StripePaymentController/handlePayment');?>" method="post"
+						<form role="form" action="<?php echo base_url('Stripe/handlePayment');?>" method="post"
 							class="form-validation" data-cc-on-file="false"
 							data-stripe-publishable-key="<?php echo $this->config->item('stripe_key') ?>"
 							id="payment-form">

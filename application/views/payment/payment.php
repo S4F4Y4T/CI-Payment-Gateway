@@ -2,219 +2,174 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"
-		rel="stylesheet" />
-<style>
-body {font-family: Arial;}
-
-/* Style the tab */
-.tab {
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-}
-
-/* Style the buttons inside the tab */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-  font-size: 17px;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #ccc;
-}
-
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-top: none;
-}
-</style>
-</head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous"></head>
 <body>
 
-<h2>Payment</h2>
+<div class="container">
 
-<div class="tab">
-  <button class="tablinks active" onclick="openCity(event, 'paypal')">Paypal</button>
-  <button class="tablinks" onclick="openCity(event, 'stripe')">Stripe</button>
-</div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
 
-<div id="paypal" class="tabcontent" style="display:block">
-    <div class="card">
-        <img src="" />
-        <div class="card-body">
-            <h5 class="card-title">Products</h5>
-            <p class="card-text">Products description</p>
-            <h6>$60usd</h6>
-            <a href="<?php echo base_url('paypal'); ?>" class="btn"><img height="150px" width="180px" src="<?php echo base_url('assets/image/paypal.png'); ?>" /></a>
+                    <form action="" method="post" id="checkout_form" class="main-form">
+
+                        <input type="hidden" id="payment_method" value="stripe">
+
+                        <div id="payment_section">
+                            <h3 class="mb-3 mt-5">Payment</h3>
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="stripe-tab" data-target="stripe" data-bs-toggle="tab" href="#stripe" role="tab" aria-controls="stripe" aria-selected="true">Stripe</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="paypal-tab" data-target="paypal" data-bs-toggle="tab" href="#paypal" role="tab" aria-controls="paypal" aria-selected="false">Paypal</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="stripe" role="tabpanel" aria-labelledby="stripe-tab">
+                                    <div class="m-5 row">
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="card_expiry_month" class="control-label">Card Number</label>
+                                                <input type="text" class="form-control" id="card_number" name="card_number" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="card_expiry_month" class="control-label">Card Expiry Month</label>
+                                                <input type="text" class="form-control" id="card_expiry_month" name="card_expiry_month" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="card_expiry_month" class="control-label">Card Expiry Year</label>
+                                                <input type="text" class="form-control" id="card_expiry_year" name="card_expiry_year" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="card_expiry_month" class="control-label">Card CVC Number</label>
+                                                <input type="text" class="form-control" id="card_cvc_number" name="card_cvc_number" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade m-5" id="paypal" role="tabpanel" aria-labelledby="paypal-tab">
+                                    Paypal Selected
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="checkout_submit">Checkout</button>
+                    </form>
+
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
-
-<div id="stripe" class="tabcontent">
-  
-
-
-	<div class="container">
-
-		<div class="row">
-			<div class="col-md-6 col-md-offset-3">
-				<div class="panel panel-default">
-					<div class="panel-body">
-
-						<?php if($this->session->flashdata('success')){ ?>
-						<div class="alert alert-success text-center">
-							<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
-							<p><?php echo $this->session->flashdata('success'); ?></p>
-						</div>
-						<?php } ?>
-
-						<form role="form" action="<?php echo base_url('stripe/');?>" method="post"
-							class="form-validation" data-cc-on-file="false"
-							data-stripe-publishable-key="<?php echo $this->config->item('stripe_key') ?>"
-							id="payment-form">
-
-							<div class='form-row row'>
-								<div class='col-xs-12 form-group card required'>
-									<label class='control-label'>Card Number</label>
-									<input autocomplete='off' class='form-control card-number' size='20' type='text'>
-								</div>
-							</div>
-
-							<div class='form-row row'>
-								<div class='col-xs-12 col-md-4 form-group cvc required'>
-									<label class='control-label'>CVC</label>
-									<input autocomplete='off' class='form-control card-cvc' placeholder='ex. 311'
-										size='4' type='text'>
-								</div>
-								<div class='col-xs-12 col-md-4 form-group expiration required'>
-									<label class='control-label'>Expiration Month</label>
-									<input class='form-control card-expiry-month' placeholder='MM' size='2' type='text'>
-								</div>
-								<div class='col-xs-12 col-md-4 form-group expiration required'>
-									<label class='control-label'>Expiration Year</label>
-									<input class='form-control card-expiry-year' placeholder='YYYY' size='4'
-										type='text'>
-								</div>
-							</div>
-
-							<div class='form-row row'>
-								<div class='col-md-12 error form-group hide'>
-									<div class='alert-danger alert'>Error occured while making the payment.</div>
-								</div>
-							</div>
-
-							<div class="row">
-								<div class="col-xs-12">
-									<button class="btn btn-danger btn-lg btn-block" type="submit">Pay ($60)</button>
-								</div>
-							</div>
-
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-
-	</div>
 
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script><script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 
 <script type="text/javascript">
-	$(function () {
-		var $stripeForm = $(".form-validation");
-		$('form.form-validation').bind('submit', function (e) {
-			var $stripeForm = $(".form-validation"),
-				inputSelector = ['input[type=email]', 'input[type=password]',
-					'input[type=text]', 'input[type=file]',
-					'textarea'
-				].join(', '),
-				$inputs = $stripeForm.find('.required').find(inputSelector),
-				$errorMessage = $stripeForm.find('div.error'),
-				valid = true;
-			$errorMessage.addClass('hide');
 
-			$('.has-error').removeClass('has-error');
-			$inputs.each(function (i, el) {
-				var $input = $(el);
-				if ($input.val() === '') {
-					$input.parent().addClass('has-error');
-					$errorMessage.removeClass('hide');
-					e.preventDefault();
-				}
-			});
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr('data-target');
+        $('#payment_method').val(target);
+    });
 
-			if (!$stripeForm.data('cc-on-file')) {
-				e.preventDefault();
-				Stripe.setPublishableKey($stripeForm.data('stripe-publishable-key'));
-				Stripe.createToken({
-					number: $('.card-number').val(),
-					cvc: $('.card-cvc').val(),
-					exp_month: $('.card-expiry-month').val(),
-					exp_year: $('.card-expiry-year').val()
-				}, stripeResponseHandler);
-			}
+    //checkout process
+    $(document).on('submit', '#checkout_form', function (e) {
 
-		});
+        e.preventDefault();
 
-		function stripeResponseHandler(status, res) {
-			if (res.error) {
-				$('.error')
-					.removeClass('hide')
-					.find('.alert')
-					.text(res.error.message);
-			} else {
-				var token = res['id'];
-				$stripeForm.find('input[type=text]').empty();
-				$stripeForm.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
-				$stripeForm.get(0).submit();
-			}
-		}
+        let submitBtn = $('#checkout_submit');
 
-	});
+        let formData = new FormData(this);
+        let method = this.method;
+        let action = this.action;
+
+        let card_number = $('#card_number').val();
+        let cvc = $('#card_cvc_number').val();
+        let exp_mont = $('#card_expiry_month').val();
+        let exp_year = $('#card_expiry_year').val();
+
+        let payment_method = $('#payment_method').val();
+
+        if(payment_method === "paypal") {
+            window.location.href = "<?= site_url('paypal') ?>";
+        } else {
+
+            Stripe.setPublishableKey("Publishable key here");
+            Stripe.createToken({
+                number: card_number,
+                cvc: cvc,
+                exp_month: exp_mont,
+                exp_year: exp_year
+            }, stripeResponseHandler);
+
+            function stripeResponseHandler(status, response) {
+                if (response.error) {
+                    console.log(response.error.message);
+                } else {
+                    var token = response['id'];
+                    formData.append('stripeToken', token);
+
+                    sendRequest();
+                }
+            }
+
+        }
+
+        function sendRequest() {
+            let endpoint = '<?= site_url('paypal') ?>';
+            if(payment_method === "paypal"){
+                endpoint = '<?= site_url('paypal') ?>';
+            }else{
+                endpoint = '<?= site_url('stripe') ?>';
+            }
+
+            $.ajax({
+                type: method,
+                url: endpoint,
+                async: true,
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    let response = JSON.parse(data);
+                    let status = Number(response.status);
+                    let message = response.message;
+
+                    if (status === 1) {
+
+                        console.log(message);
+
+                    } else {
+
+                        console.log(message);
+
+                    }
+                },
+                error: function () {
+                    console.log('An error occurred while processing your request');
+                }
+            });
+        }
+    });
+
 </script>
-
-
-
-
 
 </div>
-
-
-
-<script>
-function openCity(evt, cityName) {
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-  document.getElementById(cityName).style.display = "block";
-  evt.currentTarget.className += " active";
-}
-</script>
    
 </body>
 </html> 

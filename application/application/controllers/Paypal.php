@@ -6,142 +6,114 @@ class Paypal extends CI_Controller{
         parent::__construct(); 
          
         // Load paypal library 
-        $this->load->library('paypal_lib'); 
-        $this->theme = $this->core_model->getSetting('theme');
-         
-        // Load product model 
-        //$this->load->model('product'); 
-         
-        // Load payment model 
-        $this->load->model('payment'); 
-     } 
-      
-    function success(){ 
-        
-        $paypalInfo = $this->input->get();
-        
-        $data['payer_name'] = $paypalInfo['payer_name'];
-        $data['payer_email'] = $paypalInfo['payer_email'];
-         
-        // Pass the transaction data to view 
-        //$data['product'] = $productData; 
+         $this->load->library('paypal_lib');
+     }
 
-        //-----------Start view handler-----------\\
+    function payment(){
+        // Set variables for paypal form
+        $returnURL = site_url() . 'paypal/success'; //payment success url
+        $cancelURL = site_url() . 'paypal/cancel'; //payment cancel url
+        $notifyURL = site_url() . 'paypal/ipn'; //ipn url
+        // Add fields to paypal form
+        $this->paypal_lib->add_field('return', $returnURL);
+        $this->paypal_lib->add_field('cancel_return', $cancelURL);
+        $this->paypal_lib->add_field('notify_url', $notifyURL);
 
-        //Load Head Styles
-        $extra_styles = array();
-        $head_styles = generateGlobalStyleSheet($this->theme, $extra_styles);
-        //End Loading Head Styles
+        $this->paypal_lib->add_field('item_name', "Item");
+        $this->paypal_lib->add_field('amount', "Amount");
 
-        $head_scripts = array();
+        // Render paypal form
+        $this->paypal_lib->paypal_auto_form();
+    }
 
-        //Load page Scripts
-        $extra_scripts = array();
-        $page_scripts = generateGlobalScripts($this->theme, $extra_scripts);
-        //End Loading Page Scripts
+    function success()
+    {
+        // Retrieve transaction data from PayPal IPN POST
+        $paypalInfo = $this->input->post();
+
+        // Validate and get the ipn response
+        $ipnCheck = $this->paypal_lib->validate_ipn($paypalInfo);
+
+        // Check whether the transaction data is exists
+        if ($ipnCheck) {
+
+            $transactions_id = $this->validate_txn($paypalInfo['txn_id']);
+
+            if ($transactions_id) {
+
+                $data = ["status" => 1, "message" => "Txn Validation Success", 'data' => $paypalInfo['txn_id']];
+
+            } else {
+
+                $data = ["status" => 0, "message" => "Txn Validation Failed", 'data' => $paypalInfo['txn_id']];
+
+            }
 
 
-        $view_data = array();
 
-        $data = array(
+        } else {
+            $data = ["status" => 0, "message" => "Ipn failed"];
+        }
 
-            'theme' => $this->theme,
-            'brand_logo' => $this->core_model->getSetting('brand_logo'),
-            'page_title' => 'Dashboard',
-
-            'head_data' => array(
-                'meta_description' => 'Admin Panel Dashboard of BookingStack',
-                'headStyles' => $head_styles,
-                'headScripts' => $head_scripts
-            ),
-
-            'aside_data' => array(
-                'parent_page' => '',
-                'child_page' => ''
-            ),
-
-            'page_scripts' => $page_scripts,
-
-            'view' => 'payment/paypal/success',
-            'view_data' => $view_data
-
-        );
-
-        $this->load->view($this->theme . '/template', $data);
+        return $data;
     } 
       
-     function cancel(){ 
-         //-----------Start view handler-----------\\
-
-        //Load Head Styles
-        $extra_styles = array();
-        $head_styles = generateGlobalStyleSheet($this->theme, $extra_styles);
-        //End Loading Head Styles
-
-        $head_scripts = array();
-
-        //Load page Scripts
-        $extra_scripts = array();
-        $page_scripts = generateGlobalScripts($this->theme, $extra_scripts);
-        //End Loading Page Scripts
-
-
-        $view_data = array();
-
-        $data = array(
-
-            'theme' => $this->theme,
-            'brand_logo' => $this->core_model->getSetting('brand_logo'),
-            'page_title' => 'Dashboard',
-
-            'head_data' => array(
-                'meta_description' => 'Admin Panel Dashboard of BookingStack',
-                'headStyles' => $head_styles,
-                'headScripts' => $head_scripts
-            ),
-
-            'aside_data' => array(
-                'parent_page' => '',
-                'child_page' => ''
-            ),
-
-            'page_scripts' => $page_scripts,
-
-            'view' => 'payment/paypal/cancel',
-            'view_data' => $view_data
-
-        );
-
-        $this->load->view($this->theme . '/template', $data);
+     function cancel()
+     {
+         echo "<h1>Payment Failed</h1>";
      } 
       
-     function ipn(){ 
-        // Retrieve transaction data from PayPal IPN POST 
-        $paypalInfo = $this->input->post(); 
-         
-        if(!empty($paypalInfo)){ 
-            // Validate and get the ipn response 
-            $ipnCheck = $this->paypal_lib->validate_ipn($paypalInfo); 
- 
-            // Check whether the transaction is valid 
-            if($ipnCheck){ 
-                // Check whether the transaction data is exists 
-                $prevPayment = $this->payment->getPayment(array('txn_id' => $paypalInfo["txn_id"])); 
-                if(!$prevPayment){ 
-                    // Insert the transaction data in the database 
-                    $data['user_id']    = $paypalInfo["custom"]; 
-                    $data['product_id']    = $paypalInfo["item_number"]; 
-                    $data['txn_id']    = $paypalInfo["txn_id"]; 
-                    $data['payment_gross']    = $paypalInfo["mc_gross"]; 
-                    $data['currency_code']    = $paypalInfo["mc_currency"]; 
-                    $data['payer_name']    = trim($paypalInfo["first_name"].' '.$paypalInfo["last_name"], ' '); 
-                    $data['payer_email']    = $paypalInfo["payer_email"]; 
-                    $data['status'] = $paypalInfo["payment_status"];
-                    $data['method'] = "paypal"; 
-     
-                    $this->payment->insertTransaction($data); 
-                } 
-            } 
-        } 
-    } 
+     function ipn()
+     {
+         // Retrieve transaction data from PayPal IPN POST
+         $paypalInfo = $this->input->post();
+
+         // Validate and get the ipn response
+         $ipnCheck = $this->paypal_lib->validate_ipn($paypalInfo);
+
+         // Check whether the transaction data is exists
+         if ($ipnCheck) {
+
+             return ['status' => 1, 'message' => 'validation success', 'txn_id' => $paypalInfo['txn_id']];
+
+         }
+
+         return false;
+    }
+
+    public function validate_txn($txn_id = '')
+    {
+        if (!empty($txn_id)) {
+
+            $txn_result = FALSE;
+            $loop_run = 0;
+            $ipnValidated = true;
+
+            while (!$txn_result) {
+
+                $loop_run += 1;
+
+                //verify txn id here
+                $check_transaction = $this->core_model->fetch_data('transactions', ['txn_id' => $txn_id]);
+
+                if ($loop_run > 100) {
+                    $ipnValidated = false;
+                    $txn_result = TRUE;
+                }
+
+                if ($check_transaction) {
+                    $txn_result = TRUE;
+                }
+
+            }
+
+            if ($txn_result && $ipnValidated) {
+                return $check_transaction[0]->id;
+            }
+
+        }
+
+        return false;
+
+    }
 }

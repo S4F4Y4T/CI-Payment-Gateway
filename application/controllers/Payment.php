@@ -3,17 +3,11 @@
 class Payment extends CI_Controller{ 
      
     function  __construct(){ 
-        parent::__construct(); 
-         
-        // Load paypal library 
-        $this->load->library('paypal_lib'); 
-         
+        parent::__construct();
     } 
      
-    function index(){ 
-        $this->config->load('stripe');
+    function index(){
         $this->load->view("payment/payment");
-
     } 
      
 }

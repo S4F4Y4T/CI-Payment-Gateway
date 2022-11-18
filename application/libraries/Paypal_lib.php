@@ -15,7 +15,7 @@
  * @version     2.0 
  */ 
  
-class Paypal_lib 
+class Paypal_lib
 { 
  
     var $last_error;            // holds the last error encountered 
