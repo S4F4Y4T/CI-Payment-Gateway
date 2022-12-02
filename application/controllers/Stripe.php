@@ -14,10 +14,10 @@ class Stripe extends CI_Controller {
 
             require_once('application/libraries/stripe-php/init.php');
     
-            \Stripe\Stripe::setApiKey("Stripe token here");
+            \Stripe\Stripe::setApiKey($this->CI->config->item('stripe_secret_key'));
 
             $charge = \Stripe\Charge::create ([
-                    "amount" => "AMOUNT" * 100, //convert cent to dollar
+                    "amount" => "AMOUNT" * $this->CI->config->item('payment_amount'), //convert cent to dollar
                     "currency" => "usd",
                     "source" => $this->input->post('stripeToken'),
             ]);

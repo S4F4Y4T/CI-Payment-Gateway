@@ -109,7 +109,7 @@
             window.location.href = "<?= site_url('paypal') ?>";
         } else {
 
-            Stripe.setPublishableKey("Publishable key here");
+            Stripe.setPublishableKey(<?= $this->CI->config->item('stripe_publishable_key') ?>);
             Stripe.createToken({
                 number: card_number,
                 cvc: cvc,

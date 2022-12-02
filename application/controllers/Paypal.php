@@ -4,9 +4,18 @@ class Paypal extends CI_Controller{
      
      function  __construct(){ 
         parent::__construct(); 
+        
+        $paypalConfig = [
+            'sandbox' => $this->CI->config->item('sandbox') ,
+            'business' => $this->CI->config->item('business_email') ,
+            'paypal_lib_currency_code' => $this->CI->config->item('paypal_lib_currency_code') ,
+            'paypal_lib_button_path' => $this->CI->config->item('paypal_lib_button_path'),
+            'paypal_lib_ipn_log' => $this->CI->config->item('paypal_lib_ipn_log'),
+            'paypal_lib_ipn_log_file' => $this->CI->config->item('paypal_lib_ipn_log_file')
+        ];
          
         // Load paypal library 
-        $this->load->library('paypal_lib');
+        $this->load->library('paypal_lib', $paypalConfig);
      } 
 
     function index(){ 
@@ -19,7 +28,7 @@ class Paypal extends CI_Controller{
         $this->paypal_lib->add_field('return', $returnURL); 
         $this->paypal_lib->add_field('cancel_return', $cancelURL); 
         $this->paypal_lib->add_field('notify_url', $notifyURL);
-        $this->paypal_lib->add_field('amount',  "Amount here");
+        $this->paypal_lib->add_field('amount',  $this->CI->config->item('payment_amount'));
          
         // Render paypal form 
         $this->paypal_lib->paypal_auto_form(); 
@@ -59,7 +68,6 @@ class Paypal extends CI_Controller{
         }
 
         return $data;
-
     } 
       
      public function cancel()
@@ -78,10 +86,10 @@ class Paypal extends CI_Controller{
  
             // Check whether the transaction is valid 
             if($ipnCheck){ 
-                // Check whether the transaction data is exists 
-                $prevPayment = $this->payment->getPayment(array('txn_id' => $paypalInfo["txn_id"])); 
+                // Check whether the transaction id already exists in your db 
+                //$prevPayment = $this->payment->getPayment(array('txn_id' => $paypalInfo["txn_id"])); 
                 if(!$prevPayment){ 
-                    // Insert the transaction data in the databasehere
+                    //add the transaction record into your db here
                 } 
             } 
         } 

@@ -15,9 +15,10 @@
 |  paypal_lib_currency_code string   Currency code. 
 */ 
  
+$config['payment_amount'] = 10;
 $config['sandbox'] = TRUE; // FALSE for live environment 
  
-$config['business'] = 'safayatmahmud.99@gmail.com'; 
+$config['business'] = 'paypal@gmail.com'; 
  
 $config['paypal_lib_currency_code'] = 'USD'; 
  
@@ -27,3 +28,7 @@ $config['paypal_lib_button_path'] = 'assets/image/';
 // If (and where) to log ipn response in a file 
 $config['paypal_lib_ipn_log'] = FALSE; 
 $config['paypal_lib_ipn_log_file'] = BASEPATH . 'logs/paypal_ipn.log';
+
+$config['stripe_publishable_key'] = '';
+$config['stripe_secret_key'] = '';
+
