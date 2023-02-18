@@ -135,7 +135,7 @@ class CI_DB_sqlsrv_driver extends CI_DB {
 		);
 
 		// If the username and password are both empty, assume this is a
-		// 'Windows Authentication Mode' connection.
+		// 'Windows Auth Mode' connection.
 		if (empty($connection['UID']) && empty($connection['PWD']))
 		{
 			unset($connection['UID'], $connection['PWD']);

@@ -189,6 +189,8 @@ $config['controller_trigger'] = 'c';
 $config['function_trigger'] = 'm';
 $config['directory_trigger'] = 'd';
 
+$config['payment_amount'] = '100';
+
 /*
 |--------------------------------------------------------------------------
 | Allow $_GET array

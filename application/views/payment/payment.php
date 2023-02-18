@@ -12,6 +12,16 @@
             <div class="panel panel-default">
                 <div class="panel-body">
 
+                    <div class="alert alert-success alert-dismissible fade show d-none" role="alert">
+                        Payment Succeed
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <div class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                        Payment Failed
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
                     <form action="" method="post" id="checkout_form" class="main-form">
 
                         <input type="hidden" id="payment_method" value="stripe">
@@ -109,7 +119,7 @@
             window.location.href = "<?= site_url('paypal') ?>";
         } else {
 
-            Stripe.setPublishableKey(<?= $this->CI->config->item('stripe_publishable_key') ?>);
+            Stripe.setPublishableKey("<?= $this->config->item('stripe_publishable_key') ?>");
             Stripe.createToken({
                 number: card_number,
                 cvc: cvc,
@@ -131,7 +141,7 @@
         }
 
         function sendRequest() {
-            let endpoint = '<?= site_url('paypal') ?>';
+            let endpoint;
             if(payment_method === "paypal"){
                 endpoint = '<?= site_url('paypal') ?>';
             }else{
@@ -141,8 +151,13 @@
             $.ajax({
                 type: method,
                 url: endpoint,
-                async: true,
                 data: formData,
+                beforeSend: function () {
+                    submitBtn.text('processing...');
+                },
+                complete: function(){
+                    submitBtn.text('Checkout');
+                },
                 contentType: false,
                 processData: false,
                 success: function (data) {
@@ -153,9 +168,10 @@
                     if (status === 1) {
 
                         console.log(message);
+                        $('.alert-success').removeClass('d-none');
 
                     } else {
-
+                        $('.alert-danger').removeClass('d-none');
                         console.log(message);
 
                     }

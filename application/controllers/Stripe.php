@@ -6,18 +6,19 @@ class Stripe extends CI_Controller {
     public function __construct() {
        parent::__construct();
     }
-    
 
     public function index()
     {
+        $data = ['status' => 0, 'message' => 'An error occurred'];
+
         if($this->input->post()){
 
             require_once('application/libraries/stripe-php/init.php');
     
-            \Stripe\Stripe::setApiKey($this->CI->config->item('stripe_secret_key'));
+            \Stripe\Stripe::setApiKey($this->config->item('stripe_secret_key'));
 
             $charge = \Stripe\Charge::create ([
-                    "amount" => "AMOUNT" * $this->CI->config->item('payment_amount'), //convert cent to dollar
+                    "amount" => $this->config->item('payment_amount') * 100, //convert cent to dollar
                     "currency" => "usd",
                     "source" => $this->input->post('stripeToken'),
             ]);
@@ -28,13 +29,28 @@ class Stripe extends CI_Controller {
             // Check whether the charge is successful
             if($chargeJson['amount_refunded'] == 0 && empty($chargeJson['failure_code']) && $chargeJson['paid'] == 1 && $chargeJson['captured'] == 1){
 
-                return ['status' => 1, 'message' => 'Payment success'];
+                $data = array(
+                    'txn_id' => $chargeJson['balance_transaction'],
+                    'amount' => $chargeJson['amount'] / 100,
+                    'currency' => $chargeJson['currency'],
+                    'method' => 'stripe',
+                    'status' => 'Completed',
+                    'date_time' => date("Y-m-d H:i:s")
+                );
+
+                $transaction = $this->db->insert("transactions", $data);
+
+                if($transaction){
+                    $data = ['status' => 1, 'message' => 'Payment success'];
+                }
 
             }
            
-        }else{
-            exit('No direct script access allowed');
         }
+
+        session_write_close();
+        echo json_encode($data);
+        exit();
     }
 
 }

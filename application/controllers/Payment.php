@@ -6,8 +6,9 @@ class Payment extends CI_Controller{
         parent::__construct();
     } 
      
-    function index(){
+    function index()
+    {
         $this->load->view("payment/payment");
-    } 
-     
+    }
+
 }

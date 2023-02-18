@@ -523,7 +523,7 @@ if ( ! function_exists('set_status_header'))
 				404	=> 'Not Found',
 				405	=> 'Method Not Allowed',
 				406	=> 'Not Acceptable',
-				407	=> 'Proxy Authentication Required',
+				407	=> 'Proxy Auth Required',
 				408	=> 'Request Timeout',
 				409	=> 'Conflict',
 				410	=> 'Gone',
@@ -546,7 +546,7 @@ if ( ! function_exists('set_status_header'))
 				503	=> 'Service Unavailable',
 				504	=> 'Gateway Timeout',
 				505	=> 'HTTP Version Not Supported',
-				511	=> 'Network Authentication Required',
+				511	=> 'Network Auth Required',
 			);
 
 			if (isset($stati[$code]))

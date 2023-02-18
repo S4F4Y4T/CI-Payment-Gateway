@@ -3,15 +3,17 @@
 class Paypal extends CI_Controller{ 
      
      function  __construct(){ 
-        parent::__construct(); 
+        parent::__construct();
+
+        $this->load->model('payment_model', 'payment');
         
         $paypalConfig = [
-            'sandbox' => $this->CI->config->item('sandbox') ,
-            'business' => $this->CI->config->item('business_email') ,
-            'paypal_lib_currency_code' => $this->CI->config->item('paypal_lib_currency_code') ,
-            'paypal_lib_button_path' => $this->CI->config->item('paypal_lib_button_path'),
-            'paypal_lib_ipn_log' => $this->CI->config->item('paypal_lib_ipn_log'),
-            'paypal_lib_ipn_log_file' => $this->CI->config->item('paypal_lib_ipn_log_file')
+            'sandbox' => $this->config->item('sandbox') ,
+            'business' => $this->config->item('business_email') ,
+            'paypal_lib_currency_code' => $this->config->item('paypal_lib_currency_code') ,
+            'paypal_lib_button_path' => $this->config->item('paypal_lib_button_path'),
+            'paypal_lib_ipn_log' => $this->config->item('paypal_lib_ipn_log'),
+            'paypal_lib_ipn_log_file' => $this->config->item('paypal_lib_ipn_log_file')
         ];
          
         // Load paypal library 
@@ -28,7 +30,7 @@ class Paypal extends CI_Controller{
         $this->paypal_lib->add_field('return', $returnURL); 
         $this->paypal_lib->add_field('cancel_return', $cancelURL); 
         $this->paypal_lib->add_field('notify_url', $notifyURL);
-        $this->paypal_lib->add_field('amount',  $this->CI->config->item('payment_amount'));
+        $this->paypal_lib->add_field('amount',  $this->config->item('payment_amount'));
          
         // Render paypal form 
         $this->paypal_lib->paypal_auto_form(); 
@@ -49,9 +51,9 @@ class Paypal extends CI_Controller{
 
             if ($transactions_id) {
 
-                if ($paypalInfo["payment_status"] === "Completed" || $paypalInfo["payment_status"] === "Pending") {
+                if ($paypalInfo["payment_status"] === "Completed") {
 
-                    $data = ["status" => 1, "message" => "Payment succeed"];
+                    echo "<h1>Payment Succeed</h1>";
 
                 } else {
                     $data = ["status" => 0, "message" => "Payment status failed"];
@@ -67,7 +69,9 @@ class Paypal extends CI_Controller{
             $data = ["status" => 0, "message" => "Ipn failed"];
         }
 
-        return $data;
+        session_write_close();
+        echo json_encode($data);
+        exit();
     } 
       
      public function cancel()
@@ -87,12 +91,23 @@ class Paypal extends CI_Controller{
             // Check whether the transaction is valid 
             if($ipnCheck){ 
                 // Check whether the transaction id already exists in your db 
-                //$prevPayment = $this->payment->getPayment(array('txn_id' => $paypalInfo["txn_id"])); 
+                $prevPayment = $this->payment->getPayment(array('txn_id' => $paypalInfo["txn_id"]));
                 if(!$prevPayment){ 
                     //add the transaction record into your db here
+                    $data = array(
+                        'txn_id' => $paypalInfo['txn_id'],
+                        'amount' => $paypalInfo["mc_gross"],
+                        'currency' => $paypalInfo["mc_currency"],
+                        'method' => 'paypal',
+                        'status' => 'Completed',
+                        'date_time' => date("Y-m-d H:i:s")
+                    );
+
+                    $this->core_model->insert_data("transactions", $data);
                 } 
             } 
-        } 
+        }
+
     }
 
     public function validate_txn($txn_id = '')
@@ -108,7 +123,7 @@ class Paypal extends CI_Controller{
                 $loop_run += 1;
 
                 //validate txn here
-                $check_transaction = $this->core_model->fetch_data('transactions', ['txn_id' => $txn_id]);
+                $check_transaction = $this->payment->getPayment(array('txn_id' => $txn_id));
 
                 if ($loop_run > 100) {
                     $ipnValidated = false;
